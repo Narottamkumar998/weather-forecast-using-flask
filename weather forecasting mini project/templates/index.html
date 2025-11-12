@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🌤 Weather Forecast</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #8ABEB9;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            font-weight: 600;
+            color: #222;
+        }
+
+        .weather-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .weather-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .forecast-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .forecast-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-custom, .btn, .toggle-btn {
+            margin: 5px;
+            border-radius: 8px;
+            color: #305669;
+            border: 2px solid;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-custom:hover, .btn:hover, .toggle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+        }
+
+        .graph-img {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 10px;
+            margin-top: 25px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .graph-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 22px rgba(0, 0, 0, 0.3);
+        }
+
+        .city-name {
+            font-weight: 700;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .lead {
+            color: #444;
+            font-weight: 500;
+        }
+
+        .temp {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1000px;
+            
+        }
+
+        .toggle-btn {
+            background-color: #C1785A;
+            color: white;
+            border: 1 px solid;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .toggle-btn:hover {
+            background-color: #432323;
+        }
+
+        input[type="text"]:focus {
+            box-shadow: 0 0 10px #0dcaf0;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="mb-4">🌤️ Weather Forecast</h1>
+
+    <form method="POST" class="mb-4">
+        <div class="input-group w-75 mx-auto">
+            <input type="text" name="city" class="form-control" placeholder="Enter city name" required>
+            <button type="submit" class="btn btn-primary">Get Forecast</button>
+        </div>
+    </form>
+
+    {% if weather.city %}
+        <div class="mt-4">
+            <h2 class="city-name">{{ weather.city }}</h2>
+
+            {% if weather.temperature %}
+                <img src="{{ url_for('static', filename=weather.bg_image) }}" class="weather-icon mt-3" alt="Weather Icon">
+                <p class="lead mt-2">{{ weather.description.title() }}</p>
+                <p class="temp">Current Temperature: <strong>{{ weather.temperature }}°C</strong></p>
+
+                <div class="my-3">
+                    <a href="/view_csv_data" class="btn btn-outline-secondary btn-custom">📄 View Forecast Table</a>
+                    <a href="/download_csv" class="btn btn-outline-success btn-custom">⬇️ Download CSV</a>
+                </div>
+
+                <div class="row justify-content-center">
+                    {% for item in weather.forecast[:6] %}
+                        <div class="col-md-3 forecast-card">
+                            <h6><strong>{{ item.datetime }}</strong></h6>
+                            <img src="{{ url_for('static', filename=item.icon) }}" class="weather-icon" alt="Icon">
+                            <p class="temp">{{ item.temp }}°C</p>
+                            <p>{{ item.description.title() }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button class="toggle-btn mt-4" onclick="toggleGraphs()">📊 Show Graphs</button>
+
+                <div id="graphSection" style="display:none;">
+                    <h3 class="mt-5">🌡 Temperature Forecast</h3>
+                    <img src="{{ url_for('static', filename='graph_img/temp_graph.png') }}" class="graph-img" alt="Temperature Graph">
+
+                    <h3 class="mt-5">💧 Humidity Forecast</h3>
+                    <img src="{{ url_for('static', filename='graph_img/humidity_graph.png') }}" class="graph-img" alt="Humidity Graph">
+                </div>
+
+            {% else %}
+                <p class="text-danger">{{ weather.description }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleGraphs() {
+        const graphSection = document.getElementById("graphSection");
+        graphSection.style.display = graphSection.style.display === "none" ? "block" : "none";
+    }
+</script>
+
+</body>
+</html>
+
